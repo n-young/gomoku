@@ -1,5 +1,5 @@
 require('dotenv').config()
-const io = require('socket.io')(process.env.SOCKET_PORT, {cors: {origin: "*"}})
+const io = require('socket.io')(process.env.PORT, {cors: {origin: "*"}})
 
 // Socket options.
 io.on('connection', socket => {
