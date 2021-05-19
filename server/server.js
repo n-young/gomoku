@@ -3,8 +3,11 @@ const io = require('socket.io')(process.env.SOCKET_PORT, {cors: {origin: "*"}})
 
 // Socket options.
 io.on('connection', socket => {
+    // Establish memory.
+    const memory = []
+
     // Get and join room.
-    const room = socket.handshake.room
+    const room = socket.handshake.query.room
     socket.join(room)
 
     // When a player joins...
@@ -15,7 +18,7 @@ io.on('connection', socket => {
 
     // When a piece is played...
     socket.on('piece-played', ({board}) => {
-        console.log(`piece played; new board: ${board}`)
+        console.log(`piece played`)
         socket.broadcast.to(room).emit('piece-played', board)
     })
 })

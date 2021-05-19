@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import styled from 'styled-components'
 import { BLACK, WHITE } from '../lib/Colors'
+import { Button } from '../lib/Library'
 
 const BOARD_SIZE = 19
 
@@ -55,13 +56,19 @@ const Piece = styled.div`
     z-index: 100;
 `
 
-const WhitePiece = styled(Piece)`
+const CurrWhitePiece = styled(Piece)`
     background-color: ${WHITE};
+`
+
+const CurrBlackPiece = styled(Piece)`
+    background-color: ${BLACK};
+`
+
+const WhitePiece = styled(CurrWhitePiece)`
     opacity: 1;
 `
 
-const BlackPiece = styled(Piece)`
-    background-color: ${BLACK};
+const BlackPiece = styled(CurrBlackPiece)`
     opacity: 1;
 `
 
@@ -80,35 +87,50 @@ const setOne = (arr, x, y, v) => {
     return arr
 }
 
-// TODO: Make the border pieces less shit
+// TODO: Make the border pieces less shit.
+// TODO: Make this tidier by making board emit whenever board changes, and
+// perhaps transmitting "last played" data as well.
 export default function Board(props) {
     const [board, setBoard] = useState(zeros([BOARD_SIZE, BOARD_SIZE]))
     const [lastPlaced, setLastPlaced] = useState(1)
 
-    // Listen to socket 
+    // Listen to socket for joining players.
     useEffect(() => {
-        // If no socket, fail.
         if (props.socket == null) return
+        props.socket.on('player-joined', (player) => {
+            console.log(`Player ${player} Joined!`)
+            props.socket.emit('piece-played', { board })
+        })
+        return () => props.socket.off('player-joined')
+    }, [props.socket, board, lastPlaced])
 
-        // When a piece is played, change the board.
-        props.socket.on('piece-played', (board) => setBoard(board))
 
-        // Return callback when socket changes.
-        return () => props.socket.off('receive-message')
-    }, [props.socket])
+    // Listen to socket for played pieces.
+    useEffect(() => {
+        if (props.socket == null) return
+        props.socket.on('piece-played', (newBoard) => {
+            setLastPlaced(-lastPlaced)
+            setBoard(newBoard)
+        })
+        return () => props.socket.off('piece-played')
+    }, [props.socket, board, lastPlaced])
 
     // Place a piece by updating the board and notifying the server.
     const placePiece = (x, y) => {
+        console.log('place piece')
         const newBoard = setOne(board, x, y, lastPlaced)
         setBoard(newBoard)
         setLastPlaced(-lastPlaced)
         props.socket.emit('piece-played', { board: newBoard })
     }
 
-    // Styled piece.
-    const CurrPiece = styled(Piece)`
-        background-color: ${lastPlaced === 1 ? BLACK : WHITE}
-    `
+    // Reset the board.
+    const resetBoard = () => {
+        console.log('reset board')
+        const newBoard = zeros([BOARD_SIZE, BOARD_SIZE])
+        setBoard(newBoard)
+        props.socket.emit('piece-played', { board: newBoard })
+    }
 
     // Render tiles.
     const tiles = () => {
@@ -127,10 +149,16 @@ export default function Board(props) {
                             <WhitePiece />
                         </Tile>
                     )
+                } else if (lastPlaced === -1) {
+                    ret.push(
+                        <Tile key={`${i}-${j}`} onClick={() => placePiece(j, i)}>
+                            <CurrWhitePiece className="piece" />
+                        </Tile>
+                    )
                 } else {
                     ret.push(
                         <Tile key={`${i}-${j}`} onClick={() => placePiece(j, i)}>
-                            <CurrPiece className="piece" />
+                            <CurrBlackPiece className="piece" />
                         </Tile>
                     )
                 }
@@ -141,8 +169,11 @@ export default function Board(props) {
 
     // Render.
     return (
-        <Tiles>
-            {tiles()}
-        </Tiles>
+        <>
+            <Tiles>
+                {tiles()}
+            </Tiles>
+            <Button onClick={resetBoard}>Reset</Button>
+        </>
     )
 }
