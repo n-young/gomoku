@@ -1,1 +1,1 @@
-export const SOCKET_URL = process.env.SOCKET_URL || 'ws://localhost:3001'
+export const SOCKET_URL = "ws://gomoku-n-young.herokuapp.com/"

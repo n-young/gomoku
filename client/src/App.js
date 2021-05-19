@@ -5,6 +5,8 @@ import Home from './pages/Home'
 import Game from './pages/Game'
 import Nav from './components/Nav'
 
+require('dotenv').config()
+
 function App() {
 
     return (

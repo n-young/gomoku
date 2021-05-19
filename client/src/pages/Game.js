@@ -23,7 +23,6 @@ export default function Game(props) {
         setUsername(newUsername)
 
         // Emit message and return callback to close the socket.
-        console.log("aa")
         newSocket.emit('player-joined', {player: newUsername})
         return () => newSocket.close()
     }, [props.match.params.room])
