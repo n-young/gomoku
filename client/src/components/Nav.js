@@ -15,6 +15,10 @@ const Navbar = styled.nav`
     height: 60px;
     border-bottom: 1px solid black;
     padding: 10px 30px;
+
+    @media screen and (max-width: 768px) {
+        display: none
+    }
 `
 
 const NavHeader = styled(Header1)`

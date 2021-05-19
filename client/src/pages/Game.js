@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import io from 'socket.io-client'
 import { NEIGenerator } from 'natural-english-ids'
 
-import { Main, HContainer, Header1, Header2 } from '../lib/Library'
+import { Main, Container, Header1, Header2 } from '../lib/Library'
 import Board from '../components/Board'
 import Chat from '../components/Chat'
 import { SOCKET_URL } from "../lib/Config"
@@ -30,10 +30,10 @@ export default function Game(props) {
         <Main>
             <Header1>Room ID: {props.match.params.room}</Header1>
             <Header2>Your username: {user}</Header2>
-            <HContainer>
+            <Container>
                 <Board socket={socket} />
                 <Chat socket={socket} user={user} />
-            </HContainer>
+            </Container>
         </Main>
     )
 }

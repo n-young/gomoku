@@ -25,6 +25,12 @@ export const VContainer = styled.div`
     flex-direction: column;
 `
 
+export const Container = styled(HContainer)`
+    @media screen and (max-width: 768px) {
+        flex-direction: column;
+    }
+`
+
 export const Header1 = styled.h1`
     font-family: 'Roboto Slab', serif;
     text-decoration: underline;

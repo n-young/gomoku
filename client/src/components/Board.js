@@ -2,24 +2,23 @@ import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import { BLACK, WHITE } from '../lib/Colors'
 import { VContainer, HContainer, Button } from '../lib/Library'
+import { BOARD_SIZE, TILE_SIZE, MAX_TILE_SIZE } from '../lib/Config'
 
-const BOARD_SIZE = 19
 
 const Tiles = styled.div` 
-    width: ${BOARD_SIZE * 2}vh;
-    height: ${BOARD_SIZE * 2}vh;
+    width: calc(max(${TILE_SIZE * BOARD_SIZE}vw, ${MAX_TILE_SIZE * BOARD_SIZE}px));
+    height: calc(max(${TILE_SIZE * BOARD_SIZE}vw, ${MAX_TILE_SIZE * BOARD_SIZE}px));
     display: grid;
     grid-template-columns: repeat(${BOARD_SIZE}, 1fr);
     grid-template-rows: repeat(${BOARD_SIZE}, 1fr);
     padding: 0;
     background-color: Bisque;
+    margin-bottom: 20px;
 `
 
 const Tile = styled.div`
-    margin: 0;
+    margin: -1px;
     padding: 0;
-    width: 2vh;
-    height: 2vh;
     background-color: Bisque;
 
     &::after {
@@ -29,17 +28,17 @@ const Tile = styled.div`
         background: black;
         display: block;
         position: relative;
-        bottom: 50%;
+        bottom: calc(max(${TILE_SIZE}vw, ${MAX_TILE_SIZE}px) / 2);
     }
 
     &::before {
         content: '';
         width: 1px;
-        height: 2vh;
+        height: calc(max(${TILE_SIZE}vw, ${MAX_TILE_SIZE}px));
         background: black;
         display: block;
         position: absolute;
-        margin-left: 1vh;
+        margin-left: calc(max(${TILE_SIZE}vw, ${MAX_TILE_SIZE}px) / 2);
     }
 
     &:hover > .piece {
@@ -49,8 +48,8 @@ const Tile = styled.div`
 
 const Piece = styled.div`
     border-radius: 1000px;
-    width: 2vh;
-    height: 2vh;
+    width: calc(max(${TILE_SIZE}vw, ${MAX_TILE_SIZE}px));
+    height: calc(max(${TILE_SIZE}vw, ${MAX_TILE_SIZE}px));
     opacity: 0;
     margin: 0;
     z-index: 100;
@@ -70,6 +69,12 @@ const WhitePiece = styled(CurrWhitePiece)`
 
 const BlackPiece = styled(CurrBlackPiece)`
     opacity: 1;
+`
+
+const VVContainer = styled(VContainer)`
+    @media screen and (max-width: 768px) {
+        flex-direction: column-reverse;
+    }
 `
 
 // HELPER - returns an array of 0s
@@ -203,7 +208,7 @@ export default function Board(props) {
 
     // Render.
     return (
-        <VContainer>
+        <VVContainer>
             <Tiles>
                 {tiles()}
             </Tiles>
@@ -211,6 +216,6 @@ export default function Board(props) {
                 <Button onClick={undoMove}>Undo Move</Button>
                 <Button onClick={resetBoard}>Reset</Button>
             </HContainer>
-        </VContainer>
+        </VVContainer>
     )
 }

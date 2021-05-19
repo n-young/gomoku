@@ -1,20 +1,23 @@
 import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
-import { BLACK, WHITE, GREEN, BLUE, ORANGE } from '../lib/Colors'
-import { Text, Button, Input } from '../lib/Library'
-
-const COLORS = [GREEN, BLUE, ORANGE]
-const BOARD_SIZE = 19
+import { BLACK, WHITE } from '../lib/Colors'
+import { Text, Input } from '../lib/Library'
+import { BOARD_SIZE, TILE_SIZE, MAX_TILE_SIZE } from '../lib/Config'
 
 const ChatContainer = styled.div`
     box-sizing: content-box;
     background-color: ${WHITE};
     border: 1px solid ${BLACK};
-    width: 200px;
+    width: 300px;
     margin: 0 10px;
-    height: ${BOARD_SIZE * 2}vh;
+    height: calc(max(${TILE_SIZE * BOARD_SIZE}vw, ${MAX_TILE_SIZE * BOARD_SIZE}px));
     display: flex;
-    flex-direction: column
+    flex-direction: column;
+
+    @media screen and (max-width: 768px) {
+        margin: auto;
+        width: 400px;
+    }
 `
 
 const UserList = styled.div`
@@ -28,6 +31,10 @@ const ChatList = styled.div`
     overflow-y: scroll;
 `
 
+const ChatForm = styled.form`
+    display: flex;
+`
+
 const ChatInput = styled(Input)`
     margin: 0;
     padding: 5px;
@@ -37,10 +44,12 @@ const ChatInput = styled(Input)`
     &:focus {
         outline: none;
     }
+    width: 100%;
 `
 
 const ChatText = styled(Text)`
     margin: 0;
+    overflow-wrap: break-word;
 `
 
 export default function Chat(props) {
@@ -102,11 +111,11 @@ export default function Chat(props) {
             players: {players.join(", ")}
             </UserList>
             <ChatList>
-                {messages.map(m => <ChatText>{m.sender}: {m.message}</ChatText>)}
+                {messages.map(m => <ChatText><strong>{m.sender}</strong>: {m.message}</ChatText>)}
             </ChatList>
-            <form onSubmit={sendMessage} >
+            <ChatForm onSubmit={sendMessage} >
                 <ChatInput type="text" placeholder="chat" value={message} onChange={(e) => setMessage(e.target.value)} />
-            </form>
+            </ChatForm>
         </ChatContainer>
     )
 }
