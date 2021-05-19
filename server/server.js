@@ -7,7 +7,7 @@ app.get('/', (_, res) => {
 })
 
 const server = app.listen(process.env.PORT);
-const io = require('socket.io')(server, { cors: { origin: "*:" } })
+const io = require('socket.io')(server, { cors: { origin: "*" } })
 
 // Socket options.
 io.on('connection', socket => {
