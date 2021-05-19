@@ -44,6 +44,13 @@ io.on('connection', socket => {
 
     // When a player leaves...
     socket.on('message-sent', (m) => {
+        console.log(`message sent`)
         socket.broadcast.to(room).emit('message-sent', m)
+    })
+
+    // When won
+    socket.on('game-won', () => {
+        console.log(`game won`)
+        socket.to(room).emit('message-sent', { sender: "game", message: "Game won!"})
     })
 })

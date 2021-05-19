@@ -92,9 +92,30 @@ const setOne = (arr, x, y, v) => {
     return arr
 }
 
-// HELPER - deep copies an array
+// HELPER - deep copies an array.
 const deepCopy = (arr) => {
     return JSON.parse(JSON.stringify(arr))
+}
+
+// HELPER - check if there is a winner.
+const checkWinner = (arr) => {
+    for (let i = 0; i < arr.length; i++) {
+        for (let j = 0; j < arr.length; j++) {
+            // Look in all 8 directions
+            if (arr[j][i] === 0) { continue }
+            if ((j >= 4 && arr[j][i] === arr[j-1][i] && arr[j][i] === arr[j-2][i] && arr[j][i] === arr[j-3][i] && arr[j][i] === arr[j-4][i])
+                || (j < arr.length - 4 && arr[j][i] === arr[j+1][i] && arr[j][i] === arr[j+2][i] && arr[j][i] === arr[j+3][i] && arr[j][i] === arr[j+4][i])
+                || (i >= 4 && arr[j][i] === arr[j][i-1] && arr[j][i] === arr[j][i-2] && arr[j][i] === arr[j][i-3] && arr[j][i] === arr[j][i-4])
+                || (i < arr.length - 4 && arr[j][i] === arr[j][i+1] && arr[j][i] === arr[j][i+2] && arr[j][i] === arr[j][i+3] && arr[j][i] === arr[j][i+4])
+                || (j < arr.length - 4 && i < arr.length - 4 && arr[j][i] === arr[j+1][i+1] && arr[j][i] === arr[j+2][i+2] && arr[j][i] === arr[j+3][i+3] && arr[j][i] === arr[j+4][i+4])
+                || (j < arr.length - 4 && i >= 4 && arr[j][i] === arr[j+1][i-1] && arr[j][i] === arr[j+2][i-2] && arr[j][i] === arr[j+3][i-3] && arr[j][i] === arr[j+4][i-4])
+                || (j >= 4 && i < arr.length - 4 && arr[j][i] === arr[j-1][i+1] && arr[j][i] === arr[j-2][i+2] && arr[j][i] === arr[j-3][i+3] && arr[j][i] === arr[j-4][i+4])
+                || (j >= 4 && i >= 4 && arr[j][i] === arr[j-1][i-1] && arr[j][i] === arr[j-2][i-2] && arr[j][i] === arr[j-3][i-3] && arr[j][i] === arr[j-4][i-4])) {
+                    return true
+                }
+        }
+    }
+    return false
 }
 
 // TODO: Make the border pieces less shit.
@@ -104,6 +125,10 @@ export default function Board(props) {
     const [boardHistory, setBoardHistory] = useState([zeros([BOARD_SIZE, BOARD_SIZE])])
     const [board, setBoard] = useState(zeros([BOARD_SIZE, BOARD_SIZE]))
     const [lastPlaced, setLastPlaced] = useState(1)
+    const won = checkWinner(board)
+    // if (won) {
+    //     props.socket.emit('game-won')
+    // }
 
     // Listen to socket for joining players.
     useEffect(() => {
@@ -128,6 +153,7 @@ export default function Board(props) {
 
     // Place a piece by updating the board and notifying the server.
     const placePiece = (x, y) => {
+        if (won) { return }
         const newBoard = setOne(board, x, y, lastPlaced)
         const newBoardHistory = boardHistory.concat([deepCopy(newBoard)])
         setLastPlaced(-lastPlaced)
@@ -203,6 +229,7 @@ export default function Board(props) {
         return ret
     }
 
+    console.log(won)
     console.log(board)
     console.log(boardHistory)
 
