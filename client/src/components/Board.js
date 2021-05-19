@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import { BLACK, WHITE } from '../lib/Colors'
-import { Button } from '../lib/Library'
+import { VContainer, HContainer, Button } from '../lib/Library'
 
 const BOARD_SIZE = 19
 
 const Tiles = styled.div` 
-    width: ${BOARD_SIZE * 2}vw;
-    height: ${BOARD_SIZE * 2}vw;
+    width: ${BOARD_SIZE * 2}vh;
+    height: ${BOARD_SIZE * 2}vh;
     display: grid;
     grid-template-columns: repeat(${BOARD_SIZE}, 1fr);
     grid-template-rows: repeat(${BOARD_SIZE}, 1fr);
@@ -18,8 +18,8 @@ const Tiles = styled.div`
 const Tile = styled.div`
     margin: 0;
     padding: 0;
-    width: 2vw;
-    height: 2vw;
+    width: 2vh;
+    height: 2vh;
     background-color: Bisque;
 
     &::after {
@@ -35,11 +35,11 @@ const Tile = styled.div`
     &::before {
         content: '';
         width: 1px;
-        height: 2vw;
+        height: 2vh;
         background: black;
         display: block;
         position: absolute;
-        margin-left: 1vw;
+        margin-left: 1vh;
     }
 
     &:hover > .piece {
@@ -49,8 +49,8 @@ const Tile = styled.div`
 
 const Piece = styled.div`
     border-radius: 1000px;
-    width: 2vw;
-    height: 2vw;
+    width: 2vh;
+    height: 2vh;
     opacity: 0;
     margin: 0;
     z-index: 100;
@@ -87,49 +87,80 @@ const setOne = (arr, x, y, v) => {
     return arr
 }
 
+// HELPER - deep copies an array
+const deepCopy = (arr) => {
+    return JSON.parse(JSON.stringify(arr))
+}
+
 // TODO: Make the border pieces less shit.
 // TODO: Make this tidier by making board emit whenever board changes, and
 // perhaps transmitting "last played" data as well.
 export default function Board(props) {
+    const [boardHistory, setBoardHistory] = useState([zeros([BOARD_SIZE, BOARD_SIZE])])
     const [board, setBoard] = useState(zeros([BOARD_SIZE, BOARD_SIZE]))
     const [lastPlaced, setLastPlaced] = useState(1)
 
     // Listen to socket for joining players.
     useEffect(() => {
         if (props.socket == null) return
-        props.socket.on('player-joined', (player) => {
-            console.log(`Player ${player} Joined!`)
-            props.socket.emit('piece-played', { board })
+        props.socket.on('board-request', (player) => {
+            props.socket.emit('piece-played', { board, boardHistory })
         })
-        return () => props.socket.off('player-joined')
-    }, [props.socket, board, lastPlaced])
+        return () => props.socket.off('board-request')
+    }, [props.socket, board, boardHistory, lastPlaced])
 
 
     // Listen to socket for played pieces.
     useEffect(() => {
         if (props.socket == null) return
-        props.socket.on('piece-played', (newBoard) => {
-            setLastPlaced(-lastPlaced)
+        props.socket.on('piece-played', (newBoard, newBoardHistory, newLastPlaced) => {
+            setLastPlaced(newLastPlaced)
             setBoard(newBoard)
+            setBoardHistory(newBoardHistory)
         })
         return () => props.socket.off('piece-played')
-    }, [props.socket, board, lastPlaced])
+    }, [props.socket, board, boardHistory, lastPlaced])
 
     // Place a piece by updating the board and notifying the server.
     const placePiece = (x, y) => {
-        console.log('place piece')
         const newBoard = setOne(board, x, y, lastPlaced)
-        setBoard(newBoard)
+        const newBoardHistory = boardHistory.concat([deepCopy(newBoard)])
         setLastPlaced(-lastPlaced)
-        props.socket.emit('piece-played', { board: newBoard })
+        setBoard(newBoard)
+        setBoardHistory(newBoardHistory)
+        props.socket.emit('piece-played', { board: newBoard, boardHistory: newBoardHistory, lastPlaced: -lastPlaced })
     }
 
     // Reset the board.
     const resetBoard = () => {
-        console.log('reset board')
         const newBoard = zeros([BOARD_SIZE, BOARD_SIZE])
+        const newBoardHistory = [zeros([BOARD_SIZE, BOARD_SIZE])]
         setBoard(newBoard)
-        props.socket.emit('piece-played', { board: newBoard })
+        setBoardHistory(newBoardHistory)
+        setLastPlaced(1)
+        props.socket.emit('piece-played', { board: newBoard, boardHistory: newBoardHistory, lastPlaced: 1 })
+    }
+
+    // Undo a move. NOTE: This is wildly inefficient.
+    const undoMove = () => {
+        if (boardHistory.length > 1) {
+            let newBoard
+            let newBoardHistory
+            if (boardHistory.length === 2) {
+                newBoard = zeros([BOARD_SIZE, BOARD_SIZE])
+                newBoardHistory = [newBoard]
+                setBoardHistory(newBoardHistory)
+                setBoard(newBoard)
+                setLastPlaced(-lastPlaced)
+            } else {
+                newBoard = boardHistory[boardHistory.length - 2]
+                newBoardHistory = deepCopy(boardHistory.slice(0, boardHistory.length - 1))
+                setBoard(newBoard)
+                setBoardHistory(newBoardHistory)
+                setLastPlaced(-lastPlaced)
+            }
+            props.socket.emit('piece-played', { board: newBoard, boardHistory: newBoardHistory, lastPlaced: -lastPlaced })
+        }
     }
 
     // Render tiles.
@@ -167,13 +198,19 @@ export default function Board(props) {
         return ret
     }
 
+    console.log(board)
+    console.log(boardHistory)
+
     // Render.
     return (
-        <>
+        <VContainer>
             <Tiles>
                 {tiles()}
             </Tiles>
-            <Button onClick={resetBoard}>Reset</Button>
-        </>
+            <HContainer style={{ margin: "auto" }}>
+                <Button onClick={undoMove}>Undo Move</Button>
+                <Button onClick={resetBoard}>Reset</Button>
+            </HContainer>
+        </VContainer>
     )
 }

@@ -52,6 +52,19 @@ export const Button = styled.button`
     border: none;
     background-color: ${ORANGE};
     padding: 10px 20px;
+    margin: 5px;
+    &:hover {
+        opacity: 0.75;
+        cursor: pointer;
+    }
+`
+
+export const Input = styled.input`
+    font-family: 'Roboto Mono', monospace;
+    border: 1px solid black;
+    background-color: ${WHITE};
+    padding: 10px;
+    margin: 5px;
     &:hover {
         opacity: 0.75;
         cursor: pointer;
