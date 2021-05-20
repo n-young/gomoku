@@ -23,9 +23,6 @@ export default function Game(props) {
         margin-left: 10px;
         cursor: pointer;
     `
-    const copy = () => {
-        return 0
-    }
 
     // Set socket and emit "player-joined" message.
     useEffect(() => {
@@ -44,10 +41,10 @@ export default function Game(props) {
     return (
         <Main>
             <HHContainer>
-                <Header1>Room ID: {props.match.params.room} </Header1>
-                <Clicky onClick={() => navigator.clipboard.writeText(props.match.params.room)}>copy</Clicky>
+                <Header1>room id: {props.match.params.room} </Header1>
+                <Clicky onClick={() => navigator.clipboard.writeText(props.match.params.room)}>[copy]</Clicky>
             </HHContainer>
-            <Header2>Your username: {user}</Header2>
+            <Header2>your username: {user}</Header2>
             <Container>
                 <Board socket={socket} />
                 <Chat socket={socket} user={user} />

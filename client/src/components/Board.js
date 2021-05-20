@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import { BLACK, WHITE } from '../lib/Colors'
-import { VContainer, HContainer, Button } from '../lib/Library'
+import { VContainer, HContainer, Button, Text } from '../lib/Library'
 import { BOARD_SIZE, TILE_SIZE, MAX_TILE_SIZE } from '../lib/Config'
 
 
@@ -103,16 +103,16 @@ const checkWinner = (arr) => {
         for (let j = 0; j < arr.length; j++) {
             // Look in all 8 directions
             if (arr[j][i] === 0) { continue }
-            if ((j >= 4 && arr[j][i] === arr[j-1][i] && arr[j][i] === arr[j-2][i] && arr[j][i] === arr[j-3][i] && arr[j][i] === arr[j-4][i])
-                || (j < arr.length - 4 && arr[j][i] === arr[j+1][i] && arr[j][i] === arr[j+2][i] && arr[j][i] === arr[j+3][i] && arr[j][i] === arr[j+4][i])
-                || (i >= 4 && arr[j][i] === arr[j][i-1] && arr[j][i] === arr[j][i-2] && arr[j][i] === arr[j][i-3] && arr[j][i] === arr[j][i-4])
-                || (i < arr.length - 4 && arr[j][i] === arr[j][i+1] && arr[j][i] === arr[j][i+2] && arr[j][i] === arr[j][i+3] && arr[j][i] === arr[j][i+4])
-                || (j < arr.length - 4 && i < arr.length - 4 && arr[j][i] === arr[j+1][i+1] && arr[j][i] === arr[j+2][i+2] && arr[j][i] === arr[j+3][i+3] && arr[j][i] === arr[j+4][i+4])
-                || (j < arr.length - 4 && i >= 4 && arr[j][i] === arr[j+1][i-1] && arr[j][i] === arr[j+2][i-2] && arr[j][i] === arr[j+3][i-3] && arr[j][i] === arr[j+4][i-4])
-                || (j >= 4 && i < arr.length - 4 && arr[j][i] === arr[j-1][i+1] && arr[j][i] === arr[j-2][i+2] && arr[j][i] === arr[j-3][i+3] && arr[j][i] === arr[j-4][i+4])
-                || (j >= 4 && i >= 4 && arr[j][i] === arr[j-1][i-1] && arr[j][i] === arr[j-2][i-2] && arr[j][i] === arr[j-3][i-3] && arr[j][i] === arr[j-4][i-4])) {
-                    return true
-                }
+            if ((j >= 4 && arr[j][i] === arr[j - 1][i] && arr[j][i] === arr[j - 2][i] && arr[j][i] === arr[j - 3][i] && arr[j][i] === arr[j - 4][i])
+                || (j < arr.length - 4 && arr[j][i] === arr[j + 1][i] && arr[j][i] === arr[j + 2][i] && arr[j][i] === arr[j + 3][i] && arr[j][i] === arr[j + 4][i])
+                || (i >= 4 && arr[j][i] === arr[j][i - 1] && arr[j][i] === arr[j][i - 2] && arr[j][i] === arr[j][i - 3] && arr[j][i] === arr[j][i - 4])
+                || (i < arr.length - 4 && arr[j][i] === arr[j][i + 1] && arr[j][i] === arr[j][i + 2] && arr[j][i] === arr[j][i + 3] && arr[j][i] === arr[j][i + 4])
+                || (j < arr.length - 4 && i < arr.length - 4 && arr[j][i] === arr[j + 1][i + 1] && arr[j][i] === arr[j + 2][i + 2] && arr[j][i] === arr[j + 3][i + 3] && arr[j][i] === arr[j + 4][i + 4])
+                || (j < arr.length - 4 && i >= 4 && arr[j][i] === arr[j + 1][i - 1] && arr[j][i] === arr[j + 2][i - 2] && arr[j][i] === arr[j + 3][i - 3] && arr[j][i] === arr[j + 4][i - 4])
+                || (j >= 4 && i < arr.length - 4 && arr[j][i] === arr[j - 1][i + 1] && arr[j][i] === arr[j - 2][i + 2] && arr[j][i] === arr[j - 3][i + 3] && arr[j][i] === arr[j - 4][i + 4])
+                || (j >= 4 && i >= 4 && arr[j][i] === arr[j - 1][i - 1] && arr[j][i] === arr[j - 2][i - 2] && arr[j][i] === arr[j - 3][i - 3] && arr[j][i] === arr[j - 4][i - 4])) {
+                return true
+            }
         }
     }
     return false
@@ -126,9 +126,6 @@ export default function Board(props) {
     const [board, setBoard] = useState(zeros([BOARD_SIZE, BOARD_SIZE]))
     const [lastPlaced, setLastPlaced] = useState(1)
     const won = checkWinner(board)
-    // if (won) {
-    //     props.socket.emit('game-won')
-    // }
 
     // Listen to socket for joining players.
     useEffect(() => {
@@ -229,6 +226,10 @@ export default function Board(props) {
         return ret
     }
 
+    const whoseTurn = () => {
+        return
+    }
+
     console.log(won)
     console.log(board)
     console.log(boardHistory)
@@ -240,8 +241,11 @@ export default function Board(props) {
                 {tiles()}
             </Tiles>
             <HContainer style={{ margin: "auto" }}>
-                <Button onClick={undoMove}>Undo Move</Button>
-                <Button onClick={resetBoard}>Reset</Button>
+                <Button onClick={undoMove}>undo move</Button>
+                <Button onClick={resetBoard}>reset</Button>
+            </HContainer>
+            <HContainer style={{ margin: "auto" }}>
+                <Text>{lastPlaced === 1 ? "black" : "white"}'s turn</Text>
             </HContainer>
         </VVContainer>
     )

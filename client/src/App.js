@@ -8,7 +8,6 @@ import Nav from './components/Nav'
 require('dotenv').config()
 
 function App() {
-
     return (
         <>
             <Router>
