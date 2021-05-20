@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
-import { BLACK, WHITE } from '../lib/Colors'
+import { BLACK, WHITE, GREEN } from '../lib/Colors'
 import { VContainer, HContainer, Button, Text } from '../lib/Library'
 import { BOARD_SIZE, TILE_SIZE, MAX_TILE_SIZE } from '../lib/Config'
 
@@ -63,6 +63,10 @@ const CurrBlackPiece = styled(Piece)`
     background-color: ${BLACK};
 `
 
+const CurrBlankPiece = styled(Piece)`
+    background-color: Bisque;
+`
+
 const WhitePiece = styled(CurrWhitePiece)`
     opacity: 1;
 `
@@ -101,21 +105,28 @@ const deepCopy = (arr) => {
 const checkWinner = (arr) => {
     for (let i = 0; i < arr.length; i++) {
         for (let j = 0; j < arr.length; j++) {
-            // Look in all 8 directions
+            // Look in all 8 directions. NOTE: Oh my god... why did I write this...
             if (arr[j][i] === 0) { continue }
-            if ((j >= 4 && arr[j][i] === arr[j - 1][i] && arr[j][i] === arr[j - 2][i] && arr[j][i] === arr[j - 3][i] && arr[j][i] === arr[j - 4][i])
-                || (j < arr.length - 4 && arr[j][i] === arr[j + 1][i] && arr[j][i] === arr[j + 2][i] && arr[j][i] === arr[j + 3][i] && arr[j][i] === arr[j + 4][i])
-                || (i >= 4 && arr[j][i] === arr[j][i - 1] && arr[j][i] === arr[j][i - 2] && arr[j][i] === arr[j][i - 3] && arr[j][i] === arr[j][i - 4])
-                || (i < arr.length - 4 && arr[j][i] === arr[j][i + 1] && arr[j][i] === arr[j][i + 2] && arr[j][i] === arr[j][i + 3] && arr[j][i] === arr[j][i + 4])
-                || (j < arr.length - 4 && i < arr.length - 4 && arr[j][i] === arr[j + 1][i + 1] && arr[j][i] === arr[j + 2][i + 2] && arr[j][i] === arr[j + 3][i + 3] && arr[j][i] === arr[j + 4][i + 4])
-                || (j < arr.length - 4 && i >= 4 && arr[j][i] === arr[j + 1][i - 1] && arr[j][i] === arr[j + 2][i - 2] && arr[j][i] === arr[j + 3][i - 3] && arr[j][i] === arr[j + 4][i - 4])
-                || (j >= 4 && i < arr.length - 4 && arr[j][i] === arr[j - 1][i + 1] && arr[j][i] === arr[j - 2][i + 2] && arr[j][i] === arr[j - 3][i + 3] && arr[j][i] === arr[j - 4][i + 4])
-                || (j >= 4 && i >= 4 && arr[j][i] === arr[j - 1][i - 1] && arr[j][i] === arr[j - 2][i - 2] && arr[j][i] === arr[j - 3][i - 3] && arr[j][i] === arr[j - 4][i - 4])) {
-                return true
+            if (j >= 4 && arr[j][i] === arr[j - 1][i] && arr[j][i] === arr[j - 2][i] && arr[j][i] === arr[j - 3][i] && arr[j][i] === arr[j - 4][i]) {
+                return { won: true, wontiles: [{ "i": i, "j": j }, { "i": i, "j": j - 1 }, { "i": i, "j": j - 2 }, { "i": i, "j": j - 3 }, { "i": i, "j": j - 4 }] }
+            } else if (j < arr.length - 4 && arr[j][i] === arr[j + 1][i] && arr[j][i] === arr[j + 2][i] && arr[j][i] === arr[j + 3][i] && arr[j][i] === arr[j + 4][i]) {
+                return { won: true, wontiles: [{ "i": i, "j": j }, { "i": i, "j": j + 1 }, { "i": i, "j": j + 2 }, { "i": i, "j": j + 3 }, { "i": i, "j": j + 4 }] }
+            } else if (i >= 4 && arr[j][i] === arr[j][i - 1] && arr[j][i] === arr[j][i - 2] && arr[j][i] === arr[j][i - 3] && arr[j][i] === arr[j][i - 4]) {
+                return { won: true, wontiles: [{ "i": i, "j": j }, { "i": i - 1, "j": j }, { "i": i - 2, "j": j }, { "i": i - 3, "j": j }, { "i": i - 4, "j": j }] }
+            } else if (i < arr.length - 4 && arr[j][i] === arr[j][i + 1] && arr[j][i] === arr[j][i + 2] && arr[j][i] === arr[j][i + 3] && arr[j][i] === arr[j][i + 4]) {
+                return { won: true, wontiles: [{ "i": i, "j": j }, { "i": i + 1, "j": j }, { "i": i + 2, "j": j }, { "i": i + 3, "j": j }, { "i": i + 4, "j": j }] }
+            } else if (j < arr.length - 4 && i < arr.length - 4 && arr[j][i] === arr[j + 1][i + 1] && arr[j][i] === arr[j + 2][i + 2] && arr[j][i] === arr[j + 3][i + 3] && arr[j][i] === arr[j + 4][i + 4]) {
+                return { won: true, wontiles: [{ "i": i, "j": j }, { "i": i + 1, "j": j + 1 }, { "i": i + 2, "j": j + 2 }, { "i": i + 3, "j": j + 3 }, { "i": i + 4, "j": j + 4 }] }
+            } else if (j < arr.length - 4 && i >= 4 && arr[j][i] === arr[j + 1][i - 1] && arr[j][i] === arr[j + 2][i - 2] && arr[j][i] === arr[j + 3][i - 3] && arr[j][i] === arr[j + 4][i - 4]) {
+                return { won: true, wontiles: [{ "i": i, "j": j }, { "i": i - 1, "j": j + 1 }, { "i": i - 2, "j": j + 2 }, { "i": i - 3, "j": j + 3 }, { "i": i - 4, "j": j + 4 }] }
+            } else if (j >= 4 && i < arr.length - 4 && arr[j][i] === arr[j - 1][i + 1] && arr[j][i] === arr[j - 2][i + 2] && arr[j][i] === arr[j - 3][i + 3] && arr[j][i] === arr[j - 4][i + 4]) {
+                return { won: true, wontiles: [{ "i": i, "j": j }, { "i": i + 1, "j": j - 1 }, { "i": i + 2, "j": j - 2 }, { "i": i + 3, "j": j - 3 }, { "i": i + 4, "j": j - 4 }] }
+            } else if (j >= 4 && i >= 4 && arr[j][i] === arr[j - 1][i - 1] && arr[j][i] === arr[j - 2][i - 2] && arr[j][i] === arr[j - 3][i - 3] && arr[j][i] === arr[j - 4][i - 4]) {
+                return { won: true, wontiles: [{ "i": i, "j": j }, { "i": i - 1, "j": j - 1 }, { "i": i - 2, "j": j - 2 }, { "i": i - 3, "j": j - 3 }, { "i": i - 4, "j": j - 4 }] }
             }
         }
     }
-    return false
+    return { won: false }
 }
 
 // TODO: Make the border pieces less shit.
@@ -125,7 +136,7 @@ export default function Board(props) {
     const [boardHistory, setBoardHistory] = useState([zeros([BOARD_SIZE, BOARD_SIZE])])
     const [board, setBoard] = useState(zeros([BOARD_SIZE, BOARD_SIZE]))
     const [lastPlaced, setLastPlaced] = useState(1)
-    const won = checkWinner(board)
+    const { won, wontiles } = checkWinner(board)
 
     // Listen to socket for joining players.
     useEffect(() => {
@@ -194,29 +205,39 @@ export default function Board(props) {
     // Render tiles.
     const tiles = () => {
         const ret = []
+        console.log("WONTILES")
+        console.log(wontiles)
+        console.log(won && wontiles.includes({ "i": 0, "j": 0 }))
         for (let i = 0; i < BOARD_SIZE; i++) {
             for (let j = 0; j < BOARD_SIZE; j++) {
-                if (board[i][j] === 1) {
+                const styles = won && wontiles.filter(v => v.i === i && v.j === j).length > 0 ? { "background-color": GREEN } : {}
+                if (board[j][i] === 1) {
                     ret.push(
-                        <Tile key={`${i}-${j}`} >
+                        <Tile key={`${j}-${i}`} style={styles}>
                             <BlackPiece />
                         </Tile>
                     )
-                } else if (board[i][j] === -1) {
+                } else if (board[j][i] === -1) {
                     ret.push(
-                        <Tile key={`${i}-${j}`} >
+                        <Tile key={`${j}-${i}`} style={styles}>
                             <WhitePiece />
+                        </Tile>
+                    )
+                } else if (won) {
+                    ret.push(
+                        <Tile key={`${j}-${i}`} onClick={() => placePiece(i, j)} style={styles}>
+                            <CurrBlankPiece className="piece" />
                         </Tile>
                     )
                 } else if (lastPlaced === -1) {
                     ret.push(
-                        <Tile key={`${i}-${j}`} onClick={() => placePiece(j, i)}>
+                        <Tile key={`${j}-${i}`} onClick={() => placePiece(i, j)} style={styles}>
                             <CurrWhitePiece className="piece" />
                         </Tile>
                     )
                 } else {
                     ret.push(
-                        <Tile key={`${i}-${j}`} onClick={() => placePiece(j, i)}>
+                        <Tile key={`${j}-${i}`} onClick={() => placePiece(i, j)} style={styles}>
                             <CurrBlackPiece className="piece" />
                         </Tile>
                     )
@@ -224,10 +245,6 @@ export default function Board(props) {
             }
         }
         return ret
-    }
-
-    const whoseTurn = () => {
-        return
     }
 
     console.log(won)

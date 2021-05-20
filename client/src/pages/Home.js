@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import ReactDOM from 'react-dom';
 import Modal from 'react-modal';
 import { useHistory } from 'react-router-dom'
 import { NEIGenerator } from 'natural-english-ids'
