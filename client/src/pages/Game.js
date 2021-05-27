@@ -3,17 +3,20 @@ import styled from 'styled-components'
 import io from 'socket.io-client'
 import { NEIGenerator } from 'natural-english-ids'
 
+import { useUsername } from '../contexts/UsernameProvider'
 import { Main, Container, HContainer, Header1, Header2 } from '../lib/Library'
 import Board from '../components/Board'
 import Chat from '../components/Chat'
 import { SOCKET_URL } from "../lib/Config"
 
 export default function Game(props) {
+    const { username } = useUsername()
+
     // Create new username.
     const gen = new NEIGenerator({ length: 2 })
     const newUsername = gen.generate()
     const [socket, setSocket] = useState()
-    const [user, setUser] = useState(newUsername)
+    const [user, setUser] = useState(username || newUsername)
 
     const HHContainer = styled(HContainer)`
         align-items: center

@@ -6,6 +6,8 @@ import Game from './pages/Game'
 import Nav from './components/Nav'
 import Options from './components/Options';
 
+import { UsernameProvider } from './contexts/UsernameProvider'
+
 require('dotenv').config()
 
 function App() {
@@ -14,7 +16,7 @@ function App() {
     const closeOptions = () => { setOptionsOpen(false) }
 
     return (
-        <>
+        <UsernameProvider>
             <Router>
                 <Nav openOptions={openOptions} />
                 <Switch>
@@ -26,7 +28,7 @@ function App() {
                 </Switch>
             </Router>
             <Options isOptionsOpen={isOptionsOpen} closeOptions={closeOptions} />
-        </>
+        </UsernameProvider>
     );
 }
 

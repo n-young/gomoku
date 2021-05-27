@@ -1,5 +1,6 @@
 import Modal from 'react-modal'
-import { Header2, Text } from '../lib/Library'
+import { Header2, HContainer, Input, Text } from '../lib/Library'
+import { useUsername } from "../contexts/UsernameProvider"
 
 const modalStyles = {
     content: {
@@ -14,6 +15,8 @@ const modalStyles = {
 };
 
 export default function Options(props) {
+    const { username, setUsername } = useUsername()
+
     return (
         <Modal
             isOpen={props.isOptionsOpen}
@@ -21,7 +24,10 @@ export default function Options(props) {
             style={modalStyles}
         >
             <Header2>Options</Header2>
-            <Text>Under construction!</Text>
+            <HContainer>
+                <Text>Username:</Text>
+                <Input value={username} onChange={(e) => setUsername(e.target.value)} />
+            </HContainer>
         </Modal>
     )
 }
